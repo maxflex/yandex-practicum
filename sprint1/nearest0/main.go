@@ -7,15 +7,7 @@ import (
 	"strings"
 )
 
-func main() {
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	scanner.Scan()
-	blocks := strings.Fields(scanner.Text())
-	solve(blocks)
-}
-
-func solve(blocks []string) {
+func solve(blocks []string) []int {
 	distances := make([]int, len(blocks))
 	counter := -1
 	for i, v := range blocks {
@@ -33,12 +25,12 @@ func solve(blocks []string) {
 	for i := len(blocks) - 1; i >= 0; i-- {
 		if blocks[i] == "0" {
 			counter = 0
+			result[i] = counter
 			continue
 		}
-		switch counter {
-		case -1:
+		if counter == -1 {
 			result[i] = distances[i]
-		default:
+		} else {
 			counter++
 			if distances[i] == -1 || counter < distances[i] {
 				result[i] = counter
@@ -47,5 +39,22 @@ func solve(blocks []string) {
 			}
 		}
 	}
-	fmt.Print(result)
+	return result
+}
+
+func printResult(result []int) {
+	writer := bufio.NewWriter(os.Stdout)
+	for _, v := range result {
+		fmt.Fprintf(writer, "%v ", v)
+	}
+	writer.Flush()
+}
+
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	scanner.Scan()
+	blocks := strings.Fields(scanner.Text())
+	result := solve(blocks)
+	printResult(result)
 }
