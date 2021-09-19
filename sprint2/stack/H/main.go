@@ -29,5 +29,9 @@ func main() {
 			}
 		}
 	}
-	fmt.Print("True")
+	if s.empty() {
+		fmt.Print("True")
+	} else {
+		fmt.Print("False")
+	}
 }

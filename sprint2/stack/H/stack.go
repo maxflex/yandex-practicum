@@ -20,3 +20,7 @@ func (s *Stack) pop() (rune, error) {
 	s.items = s.items[:len(s.items)-1]
 	return popped, nil
 }
+
+func (s *Stack) empty() bool {
+	return len(s.items) == 0
+}
