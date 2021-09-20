@@ -10,40 +10,49 @@ import (
 )
 
 type Queue struct {
-	items []int
-	i, j  int
+	items      []int
+	i, j, size int
 }
 
 func (q *Queue) init(size int) {
 	q.items = make([]int, size)
-	fmt.Println("Creted queue of size", size, cap(q.items))
-	q.i, q.j = 0, 0
+	q.i, q.j = -1, -1
+	q.size = 0
 }
 
-func (q *Queue) push(x int) bool {
-	fmt.Println("Will push at index", q.j, "Q.i", q.i, q.isFull())
+func (q *Queue) enqueue(x int) bool {
 	if q.isFull() {
 		return false
 	}
+	if q.j == -1 {
+		q.j, q.i = 0, 0
+	} else {
+		q.j = (q.j + 1) % cap(q.items)
+	}
 	q.items[q.j] = x
-	q.j = (q.j + 1) % cap(q.items)
+	q.size++
 	return true
 }
 
 func (q *Queue) isEmpty() bool {
-	return q.j == q.i
+	return q.i == -1
 }
 
 func (q *Queue) isFull() bool {
-	return q.i == (q.j+1)%cap(q.items)
+	return (q.j+1)%cap(q.items) == q.i
 }
 
-func (q *Queue) pop() (int, error) {
+func (q *Queue) dequeue() (int, error) {
 	if q.isEmpty() {
 		return -1, errors.New("queue empty")
 	}
 	popped := q.items[q.i]
-	q.i = (q.i + 1) % cap(q.items)
+	q.size--
+	if q.i == q.j {
+		q.i, q.j = -1, -1
+	} else {
+		q.i = (q.i + 1) % cap(q.items)
+	}
 	return popped, nil
 }
 
@@ -74,17 +83,17 @@ func main() {
 			}
 		case "push":
 			x, _ := strconv.Atoi(line[1])
-			if !q.push(x) {
+			if !q.enqueue(x) {
 				fmt.Fprintln(writer, "error")
 			}
 		case "pop":
-			if popped, err := q.pop(); err != nil {
+			if popped, err := q.dequeue(); err != nil {
 				fmt.Fprintln(writer, "None")
 			} else {
 				fmt.Fprintln(writer, popped)
 			}
 		case "size":
-			fmt.Fprintln(writer, cap(q.items))
+			fmt.Fprintln(writer, q.size)
 		}
 	}
 	writer.Flush()
