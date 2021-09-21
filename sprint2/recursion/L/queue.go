@@ -1,21 +1,18 @@
 package main
 
-import (
-	"errors"
-	"math/big"
-)
+import "errors"
 
 type Queue struct {
-	items []*big.Int
+	items []uint64
 	i, j  int
 }
 
 func (q *Queue) init(size int) {
-	q.items = make([]*big.Int, size)
+	q.items = make([]uint64, size)
 	q.i, q.j = -1, -1
 }
 
-func (q *Queue) enqueue(x *big.Int) bool {
+func (q *Queue) enqueue(x uint64) bool {
 	if q.isFull() {
 		return false
 	}
@@ -36,9 +33,9 @@ func (q *Queue) isFull() bool {
 	return (q.j+1)%cap(q.items) == q.i
 }
 
-func (q *Queue) dequeue() (*big.Int, error) {
+func (q *Queue) dequeue() (uint64, error) {
 	if q.isEmpty() {
-		return big.NewInt(0), errors.New("queue empty")
+		return 0, errors.New("queue empty")
 	}
 	popped := q.items[q.i]
 	if q.i == q.j {
@@ -49,9 +46,9 @@ func (q *Queue) dequeue() (*big.Int, error) {
 	return popped, nil
 }
 
-func (q *Queue) peek() (*big.Int, error) {
+func (q *Queue) peek() (uint64, error) {
 	if q.isEmpty() {
-		return big.NewInt(0), errors.New("queue empty")
+		return 0, errors.New("queue empty")
 	}
 	return q.items[q.i], nil
 }
