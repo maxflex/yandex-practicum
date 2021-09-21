@@ -14,7 +14,6 @@ func main() {
 	scanner.Scan()
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
-		fmt.Println(line)
 		switch line[0] {
 		case "size":
 			fmt.Fprintln(writer, l.size)

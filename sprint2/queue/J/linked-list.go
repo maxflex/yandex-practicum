@@ -13,23 +13,17 @@ type LinkedList struct {
 	size uint
 }
 
-func (l *LinkedList) Init(val string) {
-	node := ListNode{val, nil}
-	l.head = &node
-	l.tail = &node
-	l.size = 1
-}
-
 func (l *LinkedList) Enqueue(val string) {
+	node := ListNode{val, nil}
 	if l.IsEmpty() {
-		l.Init(val)
+		l.head = &node
+		l.tail = &node
 	} else {
-		node := ListNode{val, nil}
 		prevTail := l.tail
 		l.tail = &node
 		prevTail.next = &node
-		l.size++
 	}
+	l.size++
 }
 
 func (l *LinkedList) Dequeue() (string, error) {
