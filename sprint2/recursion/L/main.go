@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func solve(n int) uint64 {
 	if n < 2 {
@@ -40,10 +38,27 @@ func pow(base uint64, exponent uint8) uint64 {
 }
 
 func main() {
-	var (
-		n int
-		k uint8
-	)
-	fmt.Scanf("%d %d", &n, &k)
-	fmt.Println(solve(n) % pow(10, k))
+	for i := 68; i <= 98; i++ {
+		solve := solve(i)
+		fmt.Printf("i: %v\n%v\n====================\n", i, solve)
+	}
+	// var (
+	// 	n int
+	// 	k uint8
+	// )
+	// fmt.Scanf("%d %d", &n, &k)
+	// fmt.Printf("n: %v | k: %v | solve: %v | pow: %v\n", n, k, solve(n), pow(10, k))
+	// fmt.Println(solve(n) % pow(10, k))
 }
+
+/**
+https://play.golang.org/p/s_y6TJByqZR
+a := big.NewInt(4660046610375530309)
+	b := big.NewInt(7540113804746346429)
+	result := a.Add(a, b)
+	fmt.Println(result)
+	result = result.Add(result, b)
+	fmt.Println(result)
+	mod := big.NewInt(10000)
+	fmt.Println(result.Mod(result, mod))
+*/
