@@ -8,21 +8,29 @@ import (
 	"strings"
 )
 
+/**
+Основная идея: если искомое меньше, то делаем:
+arr = arr[:mid]
+если искомое больше, делаем:
+arr = arr[mid+1:]
+
+Но проблема в том, когда так модифицируем arr, то
+теряются иднексы. Надо как-то сохранить индекс
+Запутанная логика в функции в основном связана с тем,
+как сохранить индекс, когда исходный массив так меняется
+*/
 func search(arr []int, x int) int {
 	mid := (len(arr) - 1) / 2
 	index := mid
-	// fmt.Println("initial index", index, "looking for", x)
 	for arr[mid] != x {
 		less := false
-		if arr[mid] < x {
+		if x > arr[mid] {
 			arr = arr[mid+1:]
 			index++
-			// fmt.Println("index++", index)
 		} else {
 			arr = arr[:mid]
-			less = true
 			index--
-			// fmt.Println("index--", index)
+			less = true
 		}
 		if len(arr) == 0 {
 			return -1
@@ -30,10 +38,8 @@ func search(arr []int, x int) int {
 		mid = (len(arr) - 1) / 2
 		if less {
 			index -= (len(arr) - 1 - mid)
-			// fmt.Println("index -= (len(arr) - 1 - mid)", index)
 		} else {
 			index += mid
-			// fmt.Println("index += mid", index)
 		}
 	}
 	return index
