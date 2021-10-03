@@ -25,7 +25,7 @@ func merge(arr []int, left int, mid int, right int) (result []int) {
 		result = append(result, arrLeft[i])
 		i++
 	}
-	for j < len(arrLeft) {
+	for j < len(arrRight) {
 		result = append(result, arrRight[j])
 		j++
 	}
