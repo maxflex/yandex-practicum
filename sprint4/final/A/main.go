@@ -1,3 +1,40 @@
+/**
+ID успешной посылки: 55187308
+
+АЛГОРИТМ
+
+Поисковый индекс содержит структуру:
+слово1 => [
+	{индекс документа, сколько раз встречается},
+	{индекс документа, сколько раз встречается},
+]
+слово2 => [
+	{индекс документа, сколько раз встречается},
+	{индекс документа, сколько раз встречается},
+]
+
+Далее парсим входящий поисковый запрос, присваивая каждому документу приоритет в выдаче:
+по каждому слову в запросе обращаемся в поисковый индекс, и увеличиваем docIndex на count
+
+
+ВЫЧИСЛИТЕЛЬНАЯ СЛОЖНОСТЬ
+
+Добавить документ в поисковый индекс:
+O(M) – где M длина текста документа
+
+Сформировать весь поисковый индекс:
+O(L) - где L суммарная длина текста в N входящих документах
+
+Получить результаты поиска по запросу:
+O(L) – чтобы распарсить запрос по словам, где L – длина поискового запроса
+O(N * M * L)– где N - кол-во слов в поисковом запросе, M – кол-во слов в индексе, L - кол-во повторений слова в индексе
+
+
+ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ
+O(M * L) - для поискового индекса – где M – суммарное кол-во слов во всех документах, L - кол-во повторений слова
+O(L) – для текущего поискового запроса – где L - длина поискового запроса
+Кэш хранит только результаты 1 последнего запроса, поэтому O(1)
+*/
 package main
 
 import (
@@ -9,6 +46,10 @@ import (
 	"strings"
 )
 
+/**
+docIndex – индекс документа
+count – сколько раз встречается
+*/
 type SearchHit struct {
 	docIndex, count int
 }
@@ -22,8 +63,19 @@ func (sr SearchResults) String() (s string) {
 	return
 }
 
+/**
+слово => [
+	{индекс документа, сколько раз встречается},
+	{индекс документа, сколько раз встречается},
+]
+*/
 type SearchIndex map[string][]SearchHit
 
+/**
+docs – слайс всех документов
+index – поисковый индекс
+cache – кешируем последний поисковый запрос
+*/
 type SearchEngine struct {
 	docs  []string
 	index SearchIndex
@@ -36,25 +88,42 @@ func (s *SearchEngine) init(size int) {
 	s.cache = make(map[string]SearchResults)
 }
 
+/**
+Добавить документ в поисковый индекс, распарсив по словам
+слово1 => [
+	{индекс добавляемого документа, сколько раз встречается},
+]
+слово2 => [
+	{индекс добавляемого документа, сколько раз встречается},
+]
+*/
 func (s *SearchEngine) addDoc(doc string) {
 	s.docs = append(s.docs, doc)
 	docIndex := len(s.docs) - 1
-	termCounter := make(map[string]int)
-	for _, term := range strings.Fields(doc) {
-		termCounter[term]++
+	wordCounter := make(map[string]int)
+	for _, word := range strings.Fields(doc) {
+		wordCounter[word]++
 	}
-	for term, count := range termCounter {
-		s.index[term] = append(s.index[term], SearchHit{docIndex, count})
+	for word, count := range wordCounter {
+		s.index[word] = append(s.index[word], SearchHit{docIndex, count})
 	}
 }
 
+/**
+Вернуть результаты поиска по запросу
+*/
 func (s *SearchEngine) query(q string) SearchResults {
-	if sr, ok := s.cache[q]; ok {
-		return sr
+	// есть ли поисковой запрос в кэше?
+	if cached, ok := s.cache[q]; ok {
+		return cached
 	}
+	// максимальное кол-во результатов в выдаче
 	limit := 5
+	// очищаем кэш
 	s.cache = make(map[string]SearchResults)
+	// индекс документа => вес в выдаче
 	counter := make(map[int]int)
+	// не учитываем дубли в запросе
 	seen := make(map[string]bool)
 	for _, term := range strings.Fields(q) {
 		if _, ok := seen[term]; !ok {
@@ -68,6 +137,7 @@ func (s *SearchEngine) query(q string) SearchResults {
 	for k, v := range counter {
 		sr = append(sr, SearchHit{k, v})
 	}
+	// сортируем по весу desc, индекс документа asc
 	sort.Slice(sr, func(i, j int) bool {
 		if sr[i].count != sr[j].count {
 			return sr[i].count > sr[j].count
@@ -77,6 +147,7 @@ func (s *SearchEngine) query(q string) SearchResults {
 	if len(sr) < limit {
 		limit = len(sr)
 	}
+	// кэшируем последний запрос
 	s.cache[q] = sr[0:limit]
 	return sr[0:limit]
 }
